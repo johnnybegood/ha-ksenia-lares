@@ -1,0 +1,11 @@
+"""Constants for the Ksenia Lares Alarm integration."""
+
+DOMAIN = "ksenia_lares"
+DEFAULT_TIMEOUT = 10
+
+ZONE_STATUS_ALARM = "ALARM"
+ZONE_STATUS_NORMAL = "NORMAL"
+ZONE_STATUS_NOT_USED = "NOT_USED"
+
+ZONE_BYPASS_OFF = "UN_BYPASS"
+ZONE_BYPASS_ON = "BYPASS"
