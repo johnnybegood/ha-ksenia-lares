@@ -1,12 +1,16 @@
 """Base component for Lares"""
-import logging
-
 import asyncio
+import logging
 import re
+
 import aiohttp
 from aiohttp.http import RESPONSES
-
+from getmac import get_mac_address
 from lxml import etree
+
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, format_mac
+
+from .const import DOMAIN, MANUFACTURER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,19 +24,55 @@ class LaresBase:
         host = data["host"]
 
         self._auth = aiohttp.BasicAuth(username, password)
-        self._host = f"http://{host}:4202"
+        self._ip = host
+        self._port = 4202
+        self._host = f"http://{host}:{self._port}"
 
     async def info(self):
-        """Get device info"""
+        """Get general info"""
         response = await self.get("info/generalInfo.xml")
 
         if response is None:
             return None
 
+        mac = get_mac_address(ip=self._ip)
+        unique_id = str(mac)
+
+        if mac is None:
+            # Fallback to IP addresses when MAC cannot be determined
+            unique_id = f"{self._ip}:{self._port}"
+
         info = {
+            "mac": mac,
+            "id": unique_id,
             "name": response.xpath("/generalInfo/productName")[0].text,
             "info": response.xpath("/generalInfo/info1")[0].text,
+            "version": response.xpath("/generalInfo/productHighRevision")[0].text,
+            "revision": response.xpath("/generalInfo/productLowRevision")[0].text,
+            "build": response.xpath("/generalInfo/productBuildRevision")[0].text,
         }
+
+        return info
+
+    async def device_info(self):
+        """Get device info"""
+        device_info = await self.info()
+
+        if device_info is None:
+            return None
+
+        info = {
+            "identifiers": {(DOMAIN, device_info["id"])},
+            "name": device_info["name"],
+            "manufacturer": MANUFACTURER,
+            "model": device_info["name"],
+            "sw_version": f'{device_info["version"]}.{device_info["revision"]}.{device_info["build"]}',
+        }
+
+        mac = device_info["mac"]
+
+        if mac is not None:
+            info["connections"] = {(CONNECTION_NETWORK_MAC, format_mac(mac))}
 
         return info
 

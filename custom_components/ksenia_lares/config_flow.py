@@ -1,12 +1,13 @@
 """Config flow for Ksenia Lares Alarm integration."""
+from functools import partial
 import logging
 
 import voluptuous as vol
 
 from homeassistant import config_entries, core, exceptions
 
-from .const import DOMAIN  # pylint:disable=unused-import
 from .base import LaresBase
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ async def validate_input(hass: core.HomeAssistant, data):
     # InvalidAuth
 
     # Return info that you want to store in the config entry.
-    return {"title": info["name"]}
+    return {"title": info["name"], "id": info["id"]}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -63,6 +64,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
+            # Abort in case the host was already configured before.
+            await self.async_set_unique_id(str(info["id"]))
+            self._abort_if_unique_id_configured()
+
             return self.async_create_entry(title=info["title"], data=user_input)
 
         return self.async_show_form(

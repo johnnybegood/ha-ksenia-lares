@@ -1,26 +1,25 @@
 """This component provides support for Lares motion/door events."""
 import asyncio
 import datetime
+from datetime import timedelta
 import logging
+
 import async_timeout
 
-from datetime import timedelta
-
 from homeassistant.components.binary_sensor import BinarySensorEntity
-
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
 
+from .base import LaresBase
 from .const import (
     DEFAULT_TIMEOUT,
+    ZONE_BYPASS_ON,
     ZONE_STATUS_ALARM,
     ZONE_STATUS_NOT_USED,
-    ZONE_BYPASS_ON,
 )
-from .base import LaresBase
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +34,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     client = LaresBase(config_entry.data)
     descriptions = await client.zoneDescriptions()
+    device_info = await client.device_info()
 
     async def async_update_data():
         """Perform the actual updates."""
@@ -54,7 +54,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     await coordinator.async_refresh()
 
     async_add_devices(
-        LaresSensor(coordinator, idx, descriptions[idx])
+        LaresSensor(coordinator, idx, descriptions[idx], device_info)
         for idx, zone in enumerate(coordinator.data)
     )
 
@@ -62,13 +62,14 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class LaresSensor(CoordinatorEntity, BinarySensorEntity):
     """An implementation of a Lares door/window/motion sensor."""
 
-    def __init__(self, coordinator, idx, description):
+    def __init__(self, coordinator, idx, description, device_info):
         """Initialize a the switch."""
         super().__init__(coordinator)
 
         self._coordinator = coordinator
         self._description = description
         self._idx = idx
+        self._device_info = device_info
 
     @property
     def unique_id(self):
@@ -96,3 +97,8 @@ class LaresSensor(CoordinatorEntity, BinarySensorEntity):
     def device_class(self):
         """Return the class of this device."""
         return DEFAULT_DEVICE_CLASS
+
+    @property
+    def device_info(self):
+        """Return basic information of this device."""
+        return self._device_info
