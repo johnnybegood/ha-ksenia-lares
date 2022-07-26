@@ -5,8 +5,8 @@
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/ksenia_lares",
   "requirements": [
-    "lxml==4.6.3",
-    "getmac==0.8.2"
+    "lxml",
+    "getmac"
   ],
   "ssdp": [],
   "zeroconf": [],
