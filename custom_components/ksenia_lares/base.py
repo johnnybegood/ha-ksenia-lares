@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import re
+from typing import Text
 
 import aiohttp
 from aiohttp.http import RESPONSES
@@ -27,6 +28,8 @@ class LaresBase:
         self._ip = host
         self._port = 4202
         self._host = f"http://{host}:{self._port}"
+        self._zoneDescriptions = None
+        self._partitionDescriptions = None
 
     async def info(self):
         """Get general info"""
@@ -78,17 +81,20 @@ class LaresBase:
 
     async def zoneDescriptions(self):
         """Get available zones"""
-        response = await self.get("zones/zonesDescription48IP.xml")
+        if self._zoneDescriptions is None:
+            response = await self.get("zones/zonesDescription48IP.xml")
 
-        if response is None:
-            return None
+            if response is None:
+                return None
 
-        zones = response.xpath("/zonesDescription/zone")
+            zones = response.xpath("/zonesDescription/zone")
+            self._zoneDescriptions = [zone.text for zone in zones]
 
-        return [zone.text for zone in zones]
+        return self._zoneDescriptions
 
     async def zones(self):
         """Get available zones"""
+        descriptions = await self.zoneDescriptions()
         response = await self.get("zones/zonesStatus48IP.xml")
 
         if response is None:
@@ -98,12 +104,40 @@ class LaresBase:
 
         return [
             {
+                "description": descriptions[idx],
                 "status": zone.find("status").text,
                 "bypass": zone.find("bypass").text,
                 "alarm": zone.find("alarm").text,
             }
-            for zone in zones
+            for idx, zone in zones
         ]
+
+    async def partitionDescriptions(self):
+        """Get available partitions"""
+        if self._partitionDescriptions is None:
+            response = await self.get("partitions/partitionsDescription48IP.xml")
+
+            if response is None:
+                return None
+
+            partitions = response.xpath("/partitionsDescription/partition")
+            self._partitionDescriptions = [partition.text for partition in partitions]
+
+        return self._partitionDescriptions
+
+    async def paritions(self):
+        """Get status of partitions"""
+        descriptions = await self.partitionDescriptions()
+        response = await self.get("partitions/partitionsStatus48IP.xml")
+
+        if response is None:
+            return None
+
+        partitions = response.xpath("/partitionsStatus/partition")
+        filledDescriptions = filter(lambda d: d != None, descriptions)
+        result = dict(zip(filledDescriptions, partitions))
+
+        return result
 
     async def get(self, path):
         """Generic send method."""
