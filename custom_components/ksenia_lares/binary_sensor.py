@@ -33,7 +33,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up binary sensors attached to a Lares alarm device from a config entry."""
 
     client = LaresBase(config_entry.data)
-    descriptions = await client.zoneDescriptions()
+    descriptions = await client.zone_descriptions()
     device_info = await client.device_info()
 
     async def async_update_data():
