@@ -76,7 +76,7 @@ class LaresBase:
 
         return info
 
-    async def zoneDescriptions(self):
+    async def zone_descriptions(self):
         """Get available zones"""
         response = await self.get("zones/zonesDescription48IP.xml")
 
@@ -100,7 +100,6 @@ class LaresBase:
             {
                 "status": zone.find("status").text,
                 "bypass": zone.find("bypass").text,
-                "alarm": zone.find("alarm").text,
             }
             for zone in zones
         ]
@@ -119,5 +118,5 @@ class LaresBase:
         except aiohttp.ClientConnectorError as conn_err:
             _LOGGER.debug("Host %s: Connection error %s", self._host, str(conn_err))
         except:  # pylint: disable=bare-except
-            _LOGGER.debug("Host %s: Unknown exception occurred.", self._host)
+            _LOGGER.debug("Host %s: Unknown exception occurred", self._host)
         return
