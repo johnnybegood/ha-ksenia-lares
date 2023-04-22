@@ -14,8 +14,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .base import LaresBase
 from .const import (
+    DOMAIN,
     DEFAULT_TIMEOUT,
     ZONE_BYPASS_ON,
     ZONE_STATUS_ALARM,
@@ -36,9 +36,9 @@ async def async_setup_entry(
 ) -> None:
     """Set up binary sensors attached to a Lares alarm device from a config entry."""
 
-    client = LaresBase(config_entry.data)
-    descriptions = await client.zone_descriptions()
+    client = hass.data[DOMAIN][config_entry.entry_id]
     device_info = await client.device_info()
+    descriptions = await client.zone_descriptions()
 
     async def async_update_data():
         """Perform the actual updates."""
