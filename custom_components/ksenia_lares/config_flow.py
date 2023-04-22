@@ -1,5 +1,4 @@
 """Config flow for Ksenia Lares Alarm integration."""
-from functools import partial
 import logging
 
 import voluptuous as vol
