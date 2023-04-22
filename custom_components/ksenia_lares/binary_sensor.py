@@ -1,6 +1,4 @@
 """This component provides support for Lares motion/door events."""
-import asyncio
-import datetime
 from datetime import timedelta
 import logging
 
@@ -10,8 +8,11 @@ from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
-    UpdateFailed,
 )
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .base import LaresBase
 from .const import (
@@ -26,10 +27,13 @@ _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=10)
 
 DEFAULT_DEVICE_CLASS = "motion"
-DOOR_DEVICE_CLASS = "door"
 
 
-async def async_setup_entry(hass, config_entry, async_add_devices):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up binary sensors attached to a Lares alarm device from a config entry."""
 
     client = LaresBase(config_entry.data)
@@ -53,7 +57,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
-    async_add_devices(
+    async_add_entities(
         LaresSensor(coordinator, idx, descriptions[idx], device_info)
         for idx, zone in enumerate(coordinator.data)
     )
@@ -62,14 +66,20 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class LaresSensor(CoordinatorEntity, BinarySensorEntity):
     """An implementation of a Lares door/window/motion sensor."""
 
-    def __init__(self, coordinator, idx, description, device_info):
-        """Initialize a the switch."""
+    def __init__(self, coordinator, idx, description, device_info) -> None:
+        """Initialize the sensor."""
         super().__init__(coordinator)
 
         self._coordinator = coordinator
         self._description = description
         self._idx = idx
         self._device_info = device_info
+
+        # Hide sensor if it is indicated as not used
+        is_used = self._coordinator.data[self._idx]["status"] != ZONE_STATUS_NOT_USED
+
+        self._attr_entity_registry_enabled_default = is_used
+        self._attr_entity_registry_visible_default = is_used
 
     @property
     def unique_id(self):
