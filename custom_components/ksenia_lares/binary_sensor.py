@@ -73,7 +73,9 @@ class LaresSensor(CoordinatorEntity, BinarySensorEntity):
         self._coordinator = coordinator
         self._description = description
         self._idx = idx
-        self._device_info = device_info
+
+        self._attr_device_info = device_info
+        self._attr_device_class = DEFAULT_DEVICE_CLASS
 
         # Hide sensor if it is indicated as not used
         is_used = self._coordinator.data[self._idx]["status"] != ZONE_STATUS_NOT_USED
@@ -102,13 +104,3 @@ class LaresSensor(CoordinatorEntity, BinarySensorEntity):
         status = self._coordinator.data[self._idx]["status"]
 
         return status != ZONE_STATUS_NOT_USED or status == ZONE_BYPASS_ON
-
-    @property
-    def device_class(self):
-        """Return the class of this device."""
-        return DEFAULT_DEVICE_CLASS
-
-    @property
-    def device_info(self):
-        """Return basic information of this device."""
-        return self._device_info
