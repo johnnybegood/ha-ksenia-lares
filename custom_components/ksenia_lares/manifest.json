@@ -1,12 +1,12 @@
 {
   "domain": "ksenia_lares",
   "name": "Ksenia Lares Alarm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/ksenia_lares",
   "requirements": [
-    "lxml",
-    "getmac"
+    "lxml==4.9.1",
+    "getmac==0.8.2"
   ],
   "ssdp": [],
   "zeroconf": [],

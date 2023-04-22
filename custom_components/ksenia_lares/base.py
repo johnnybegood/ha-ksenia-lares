@@ -1,10 +1,7 @@
 """Base component for Lares"""
-import asyncio
 import logging
-import re
 
 import aiohttp
-from aiohttp.http import RESPONSES
 from getmac import get_mac_address
 from lxml import etree
 
@@ -18,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 class LaresBase:
     """The implementation of the Lares base class."""
 
-    def __init__(self, data: dict):
+    def __init__(self, data: dict) -> None:
         username = data["username"]
         password = data["password"]
         host = data["host"]
