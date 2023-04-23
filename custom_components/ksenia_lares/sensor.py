@@ -54,14 +54,11 @@ class LaresSensor(CoordinatorEntity, SensorEntity):
 
         self._attr_device_info = device_info
 
-        # Hide sensor if it is indicated as not used
-        is_used = (
-            self._coordinator.data[DATA_PARTITIONS][self._idx]["status"]
-            != ZONE_STATUS_NOT_USED
-        )
+        # Hide sensor if it has no description
+        is_inactive = not self._description
 
-        self._attr_entity_registry_enabled_default = is_used
-        self._attr_entity_registry_visible_default = is_used
+        self._attr_entity_registry_enabled_default = not is_inactive
+        self._attr_entity_registry_visible_default = not is_inactive
 
     @property
     def unique_id(self):
