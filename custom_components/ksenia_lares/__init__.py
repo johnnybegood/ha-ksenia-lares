@@ -6,24 +6,28 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
+from .base import LaresBase
+from .coordinator import LaresDataUpdateCoordinator
 from .const import DOMAIN
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
-PLATFORMS = ["binary_sensor"]
-
-
-async def async_setup(hass: HomeAssistant, config: dict):
-    """Set up the Ksenia Lares Alarm component."""
-    return True
+PLATFORMS = ["binary_sensor", "sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Ksenia Lares Alarm from a config entry."""
 
-    for component in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, component)
-        )
+    client = LaresBase(entry.data)
+    coordinator = LaresDataUpdateCoordinator(hass, client)
+
+    # Preload device info
+    await client.device_info()
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    )
 
     return True
 

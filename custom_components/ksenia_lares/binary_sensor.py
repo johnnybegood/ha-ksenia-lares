@@ -2,21 +2,19 @@
 from datetime import timedelta
 import logging
 
-import async_timeout
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .base import LaresBase
 from .const import (
-    DEFAULT_TIMEOUT,
+    DOMAIN,
+    DATA_ZONES,
     ZONE_BYPASS_ON,
     ZONE_STATUS_ALARM,
     ZONE_STATUS_NOT_USED,
@@ -36,34 +34,20 @@ async def async_setup_entry(
 ) -> None:
     """Set up binary sensors attached to a Lares alarm device from a config entry."""
 
-    client = LaresBase(config_entry.data)
-    descriptions = await client.zone_descriptions()
-    device_info = await client.device_info()
-
-    async def async_update_data():
-        """Perform the actual updates."""
-
-        async with async_timeout.timeout(DEFAULT_TIMEOUT):
-            return await client.zones()
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name="lares_zones",
-        update_method=async_update_data,
-        update_interval=SCAN_INTERVAL,
-    )
+    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    device_info = await coordinator.client.device_info()
+    zone_descriptions = await coordinator.client.zone_descriptions()
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
     async_add_entities(
-        LaresSensor(coordinator, idx, descriptions[idx], device_info)
-        for idx, zone in enumerate(coordinator.data)
+        LaresBinarySensor(coordinator, idx, zone_descriptions[idx], device_info)
+        for idx, zone in enumerate(coordinator.data[DATA_ZONES])
     )
 
 
-class LaresSensor(CoordinatorEntity, BinarySensorEntity):
+class LaresBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """An implementation of a Lares door/window/motion sensor."""
 
     def __init__(self, coordinator, idx, description, device_info) -> None:
@@ -78,7 +62,10 @@ class LaresSensor(CoordinatorEntity, BinarySensorEntity):
         self._attr_device_class = DEFAULT_DEVICE_CLASS
 
         # Hide sensor if it is indicated as not used
-        is_used = self._coordinator.data[self._idx]["status"] != ZONE_STATUS_NOT_USED
+        is_used = (
+            self._coordinator.data[DATA_ZONES][self._idx]["status"]
+            != ZONE_STATUS_NOT_USED
+        )
 
         self._attr_entity_registry_enabled_default = is_used
         self._attr_entity_registry_visible_default = is_used
@@ -96,11 +83,13 @@ class LaresSensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Return the state of the sensor."""
-        return self._coordinator.data[self._idx]["status"] == ZONE_STATUS_ALARM
+        return (
+            self._coordinator.data[DATA_ZONES][self._idx]["status"] == ZONE_STATUS_ALARM
+        )
 
     @property
     def available(self):
         """Return True if entity is available."""
-        status = self._coordinator.data[self._idx]["status"]
+        status = self._coordinator.data[DATA_ZONES][self._idx]["status"]
 
         return status != ZONE_STATUS_NOT_USED or status == ZONE_BYPASS_ON

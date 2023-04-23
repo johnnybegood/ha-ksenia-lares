@@ -24,6 +24,8 @@ class LaresBase:
         self._ip = host
         self._port = 4202
         self._host = f"http://{host}:{self._port}"
+        self._zone_descriptions = None
+        self._partition_descriptions = None
 
     async def info(self):
         """Get general info"""
@@ -75,14 +77,16 @@ class LaresBase:
 
     async def zone_descriptions(self):
         """Get available zones"""
-        response = await self.get("zones/zonesDescription48IP.xml")
+        if self._zone_descriptions is None:
+            response = await self.get("zones/zonesDescription48IP.xml")
 
-        if response is None:
-            return None
+            if response is None:
+                return None
 
-        zones = response.xpath("/zonesDescription/zone")
+            zones = response.xpath("/zonesDescription/zone")
+            self._zone_descriptions = [zone.text for zone in zones]
 
-        return [zone.text for zone in zones]
+        return self._zone_descriptions
 
     async def zones(self):
         """Get available zones"""
@@ -101,6 +105,35 @@ class LaresBase:
             for zone in zones
         ]
 
+    async def partition_descriptions(self):
+        """Get available partitions"""
+        if self._partition_descriptions is None:
+            response = await self.get("partitions/partitionsDescription48IP.xml")
+
+            if response is None:
+                return None
+
+            partitions = response.xpath("/partitionsDescription/partition")
+            self._partition_descriptions = [partition.text for partition in partitions]
+
+        return self._partition_descriptions
+
+    async def paritions(self):
+        """Get status of partitions"""
+        response = await self.get("partitions/partitionsStatus48IP.xml")
+
+        if response is None:
+            return None
+
+        partitions = response.xpath("/partitionsStatus/partition")
+
+        return [
+            {
+                "status": partition.text,
+            }
+            for partition in partitions
+        ]
+
     async def get(self, path):
         """Generic send method."""
         url = f"{self._host}/xml/{path}"
@@ -116,4 +149,3 @@ class LaresBase:
             _LOGGER.debug("Host %s: Connection error %s", self._host, str(conn_err))
         except:  # pylint: disable=bare-except
             _LOGGER.debug("Host %s: Unknown exception occurred", self._host)
-        return
