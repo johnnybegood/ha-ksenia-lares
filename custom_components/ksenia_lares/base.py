@@ -149,3 +149,4 @@ class LaresBase:
             _LOGGER.debug("Host %s: Connection error %s", self._host, str(conn_err))
         except:  # pylint: disable=bare-except
             _LOGGER.debug("Host %s: Unknown exception occurred", self._host)
+        return
