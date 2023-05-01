@@ -48,10 +48,7 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
         self._attr_code_format = CodeFormat.NUMBER
         self._attr_device_info = device_info
         self._attr_code_arm_required = False
-        self._attr_supported_features = (
-            AlarmControlPanelEntityFeature.ARM_AWAY
-            | AlarmControlPanelEntityFeature.ARM_HOME
-        )
+        self._attr_supported_features = ()
 
     @property
     def unique_id(self) -> str:

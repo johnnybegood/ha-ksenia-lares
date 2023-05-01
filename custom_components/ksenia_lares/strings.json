@@ -18,5 +18,22 @@
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Link partitions to states, the state will be set when the selected partitions are armed",
+        "data": {
+          "partition_away": "Away paritions",
+          "partition_home": "Home partitions",
+          "partition_night": "Night partitions"
+        },
+        "data_description": {
+          "partition_away": "Select all partitions that need to armed for away state",
+          "partition_home": "Select all partitions that need to armed for home state",
+          "partition_night": "Select all partitions that need to armed for night state"
+        }
+      }
+    }
   }
 }
