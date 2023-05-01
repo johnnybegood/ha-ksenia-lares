@@ -24,3 +24,6 @@ PARTITION_STATUS_ALARM = "ALARM"
 CONF_PARTITION_AWAY = "partition_away"
 CONF_PARTITION_HOME = "partition_home"
 CONF_PARTITION_NIGHT = "partition_night"
+
+DATA_COORDINATOR = "coordinator"
+DATA_UPDATE_LISTENER = "update_listener"

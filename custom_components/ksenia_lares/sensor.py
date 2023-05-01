@@ -19,6 +19,7 @@ from .const import (
     PARTITION_STATUS_ARMING,
     PARTITION_STATUS_PENDING,
     PARTITION_STATUS_ALARM,
+    DATA_COORDINATOR,
 )
 
 SCAN_INTERVAL = timedelta(seconds=10)
@@ -32,7 +33,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensors attached to a Lares alarm device from a config entry."""
 
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
     device_info = await coordinator.client.device_info()
     partition_descriptions = await coordinator.client.partition_descriptions()
 
