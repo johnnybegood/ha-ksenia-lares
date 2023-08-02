@@ -25,5 +25,10 @@ CONF_PARTITION_AWAY = "partition_away"
 CONF_PARTITION_HOME = "partition_home"
 CONF_PARTITION_NIGHT = "partition_night"
 
+CONF_SCENARIO_AWAY = "scenario_away"
+CONF_SCENARIO_HOME = "scenario_home"
+CONF_SCENARIO_NIGHT = "scenario_night"
+CONF_SCENARIO_DISARM = "scenario_disarm"
+
 DATA_COORDINATOR = "coordinator"
 DATA_UPDATE_LISTENER = "update_listener"

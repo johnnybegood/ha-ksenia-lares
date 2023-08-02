@@ -20,6 +20,10 @@ from .const import (
     CONF_PARTITION_AWAY,
     CONF_PARTITION_HOME,
     CONF_PARTITION_NIGHT,
+    CONF_SCENARIO_HOME,
+    CONF_SCENARIO_AWAY,
+    CONF_SCENARIO_NIGHT,
+    CONF_SCENARIO_DISARM,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -110,19 +114,38 @@ class LaresOptionsFlowHandler(OptionsFlow):
         partitions = await self.client.partition_descriptions()
         select_partitions = {v: v for v in list(filter(None, partitions)) if v != ""}
 
+        scenarios = await self.client.scenario_descriptions()
+        scenarios_with_empty = [""] + scenarios
+
         options = {
+            vol.Required(
+                CONF_SCENARIO_DISARM,
+                default=self.config_entry.options.get(CONF_SCENARIO_DISARM, ""),
+            ): vol.In(scenarios),
             vol.Required(
                 CONF_PARTITION_AWAY,
                 default=self.config_entry.options.get(CONF_PARTITION_AWAY, []),
             ): cv.multi_select(select_partitions),
+            vol.Required(
+                CONF_SCENARIO_AWAY,
+                default=self.config_entry.options.get(CONF_SCENARIO_AWAY, ""),
+            ): vol.In(scenarios),
             vol.Optional(
                 CONF_PARTITION_HOME,
                 default=self.config_entry.options.get(CONF_PARTITION_HOME, []),
             ): cv.multi_select(select_partitions),
             vol.Optional(
+                CONF_SCENARIO_HOME,
+                default=self.config_entry.options.get(CONF_SCENARIO_HOME, ""),
+            ): vol.In(scenarios_with_empty),
+            vol.Optional(
                 CONF_PARTITION_NIGHT,
                 default=self.config_entry.options.get(CONF_PARTITION_NIGHT, []),
             ): cv.multi_select(select_partitions),
+            vol.Optional(
+                CONF_SCENARIO_NIGHT,
+                default=self.config_entry.options.get(CONF_SCENARIO_NIGHT, ""),
+            ): vol.In(scenarios_with_empty),
         }
 
         return self.async_show_form(step_id="init", data_schema=vol.Schema(options))

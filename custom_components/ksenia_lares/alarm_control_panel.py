@@ -20,7 +20,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMING,
 )
 
-from .coordinator import DataUpdateCoordinator
+from .coordinator import LaresDataUpdateCoordinator
 from .const import (
     DOMAIN,
     DATA_COORDINATOR,
@@ -31,6 +31,10 @@ from .const import (
     CONF_PARTITION_AWAY,
     CONF_PARTITION_HOME,
     CONF_PARTITION_NIGHT,
+    CONF_SCENARIO_AWAY,
+    CONF_SCENARIO_HOME,
+    CONF_SCENARIO_NIGHT,
+    CONF_SCENARIO_DISARM,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,11 +47,16 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
     device_info = await coordinator.client.device_info()
     partition_descriptions = await coordinator.client.partition_descriptions()
+    scenario_descriptions = await coordinator.client.scenario_descriptions()
 
     options = {
         CONF_PARTITION_AWAY: config_entry.options.get(CONF_PARTITION_AWAY, []),
         CONF_PARTITION_HOME: config_entry.options.get(CONF_PARTITION_HOME, []),
         CONF_PARTITION_NIGHT: config_entry.options.get(CONF_PARTITION_NIGHT, []),
+        CONF_SCENARIO_NIGHT: config_entry.options.get(CONF_SCENARIO_NIGHT, []),
+        CONF_SCENARIO_HOME: config_entry.options.get(CONF_SCENARIO_HOME, []),
+        CONF_SCENARIO_AWAY: config_entry.options.get(CONF_SCENARIO_AWAY, []),
+        CONF_SCENARIO_DISARM: config_entry.options.get(CONF_SCENARIO_DISARM, []),
     }
 
     # Fetch initial data so we have data when entities subscribe
@@ -56,7 +65,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     async_add_devices(
         [
             LaresAlarmControlPanel(
-                coordinator, device_info, partition_descriptions, options
+                coordinator,
+                device_info,
+                partition_descriptions,
+                scenario_descriptions,
+                options,
             )
         ]
     )
@@ -70,9 +83,10 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
 
     def __init__(
         self,
-        coordinator: DataUpdateCoordinator,
+        coordinator: LaresDataUpdateCoordinator,
         device_info: dict,
         partition_descriptions: dict,
+        scenario_descriptions: dict,
         options: dict,
     ) -> None:
         """Initialize a the switch."""
@@ -80,6 +94,7 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
 
         self._coordinator = coordinator
         self._partition_descriptions = partition_descriptions
+        self._scenario_descriptions = scenario_descriptions
         self._options = options
         self._attr_code_format = CodeFormat.NUMBER
         self._attr_device_info = device_info
@@ -98,27 +113,59 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
         return f"Panel {name}"
 
     @property
+    def supported_features(self) -> AlarmControlPanelEntityFeature:
+        """Return the list of supported features."""
+        supported_features = AlarmControlPanelEntityFeature(0)
+
+        if self._options[CONF_SCENARIO_AWAY] != "":
+            supported_features |= AlarmControlPanelEntityFeature.ARM_AWAY
+
+        if self._options[CONF_SCENARIO_HOME] != "":
+            supported_features |= AlarmControlPanelEntityFeature.ARM_HOME
+
+        if self._options[CONF_SCENARIO_NIGHT] != "":
+            supported_features |= AlarmControlPanelEntityFeature.ARM_NIGHT
+
+        return supported_features
+
+    @property
     def state(self) -> StateType:
         """Return the state of this panel."""
-        if self.has_partition_with_status(PARTITION_STATUS_ARMING):
+        if self.__has_partition_with_status(PARTITION_STATUS_ARMING):
             return STATE_ALARM_ARMING
 
-        if self.is_armed(CONF_PARTITION_AWAY):
+        if self.__is_armed(CONF_PARTITION_AWAY):
             return STATE_ALARM_ARMED_AWAY
 
-        if self.is_armed(CONF_PARTITION_HOME):
+        if self.__is_armed(CONF_PARTITION_HOME):
             return STATE_ALARM_ARMED_HOME
 
-        if self.is_armed(CONF_PARTITION_NIGHT):
+        if self.__is_armed(CONF_PARTITION_NIGHT):
             return STATE_ALARM_ARMED_NIGHT
 
         # If any of the not mapped partitions is armed, show custom as fallback
-        if self.has_partition_with_status(self.ARMED_STATUS):
+        if self.__has_partition_with_status(self.ARMED_STATUS):
             return STATE_ALARM_ARMED_CUSTOM_BYPASS
 
         return STATE_ALARM_DISARMED
 
-    def has_partition_with_status(self, status_list: list[str]) -> bool:
+    async def async_alarm_arm_home(self, code: str | None = None) -> None:
+        """Send arm home command."""
+        await self.__command(CONF_SCENARIO_HOME, code)
+
+    async def async_alarm_arm_away(self, code: str | None = None) -> None:
+        """Send arm home command."""
+        await self.__command(CONF_SCENARIO_AWAY, code)
+
+    async def async_alarm_arm_night(self, code: str | None = None) -> None:
+        """Send arm home command."""
+        await self.__command(CONF_SCENARIO_NIGHT, code)
+
+    async def async_alarm_disarm(self, code: str | None = None) -> None:
+        """Send disarm command."""
+        await self.__command(CONF_SCENARIO_DISARM, code)
+
+    def __has_partition_with_status(self, status_list: list[str]) -> bool:
         """Return if any partitions is arming."""
         partitions = enumerate(self._coordinator.data[DATA_PARTITIONS])
         in_state = list(
@@ -129,7 +176,7 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
 
         return len(in_state) > 0
 
-    def is_armed(self, key: str) -> bool:
+    def __is_armed(self, key: str) -> bool:
         """Return if all partitions linked to the configuration key are armed."""
         partition_names = self._options[key]
 
@@ -151,3 +198,24 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
                 return False
 
         return True
+
+    async def __command(self, key: str, code: str | None = None) -> None:
+        """Send arm home command."""
+        scenario_name = self._options[key]
+
+        if scenario_name is None:
+            _LOGGER.warning("Skipping command, no definition for %s", key)
+            return
+
+        descriptions = enumerate(self._scenario_descriptions)
+        match_gen = (idx for idx, name in descriptions if name == scenario_name)
+        matches = list(match_gen)
+
+        if len(matches) != 1:
+            _LOGGER.error("No match for %s (%s found)", key, len(matches))
+            return
+
+        scenario = matches[0]
+        _LOGGER.debug("Activating scenario %s", scenario)
+
+        await self._coordinator.client.activate_scenario(scenario, code)

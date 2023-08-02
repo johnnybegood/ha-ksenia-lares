@@ -26,6 +26,7 @@ class LaresBase:
         self._host = f"http://{host}:{self._port}"
         self._zone_descriptions = None
         self._partition_descriptions = None
+        self._scenario_descriptions = None
 
     async def info(self):
         """Get general info"""
@@ -78,13 +79,9 @@ class LaresBase:
     async def zone_descriptions(self):
         """Get available zones"""
         if self._zone_descriptions is None:
-            response = await self.get("zones/zonesDescription48IP.xml")
-
-            if response is None:
-                return None
-
-            zones = response.xpath("/zonesDescription/zone")
-            self._zone_descriptions = [zone.text for zone in zones]
+            self._zone_descriptions = await self.get_descriptions(
+                "zones/zonesDescription48IP.xml", "/zonesDescription/zone"
+            )
 
         return self._zone_descriptions
 
@@ -108,13 +105,10 @@ class LaresBase:
     async def partition_descriptions(self):
         """Get available partitions"""
         if self._partition_descriptions is None:
-            response = await self.get("partitions/partitionsDescription48IP.xml")
-
-            if response is None:
-                return None
-
-            partitions = response.xpath("/partitionsDescription/partition")
-            self._partition_descriptions = [partition.text for partition in partitions]
+            self._partition_descriptions = await self.get_descriptions(
+                "partitions/partitionsDescription48IP.xml",
+                "/partitionsDescription/partition",
+            )
 
         return self._partition_descriptions
 
@@ -133,6 +127,55 @@ class LaresBase:
             }
             for partition in partitions
         ]
+
+    async def scenarios(self):
+        """Get status of scenarios"""
+        response = await self.get("scenarios/scenariosOptions.xml")
+
+        if response is None:
+            return None
+
+        scenarios = response.xpath("/scenariosOptions/scenario")
+
+        return [
+            {
+                "id": idx,
+                "enabled": scenario.find("abil").text == "TRUE",
+                "noPin": scenario.find("nopin").text == "TRUE",
+            }
+            for idx, scenario in enumerate(scenarios)
+        ]
+
+    async def scenario_descriptions(self):
+        """Get descriptions of scenarios"""
+        if self._scenario_descriptions is None:
+            self._scenario_descriptions = await self.get_descriptions(
+                "scenarios/scenariosDescription.xml", "/scenariosDescription/scenario"
+            )
+
+        return self._scenario_descriptions
+
+    async def activate_scenario(self, scenario: int, code: str) -> bool:
+        """Activate the given scenarios, requires the alarm code"""
+        path = f"cmd/cmdOk.xml?cmd=setMacro&pin={code}&macroId={scenario}&redirectPage=/xml/cmd/cmdError.xml"
+        response = await self.get(path)
+        cmd = response.xpath("/cmd")
+
+        if cmd is None or cmd[0].text != "cmdSent":
+            _LOGGER.error("Active scenario failed: %s", response)
+            return False
+
+        return True
+
+    async def get_descriptions(self, path: str, element: str) -> dict:
+        """Get descriptions"""
+        response = await self.get(path)
+
+        if response is None:
+            return None
+
+        content = response.xpath(element)
+        return [item.text for item in content]
 
     async def get(self, path):
         """Generic send method."""

@@ -23,16 +23,25 @@
             "init": {
                 "description": "Link partitions to states, the state will be set when the selected partitions are armed",
                 "data": {
+                    "scenario_disarm": "Disarm scenario",
                     "partition_away": "Away paritions",
+                    "scenario_away": "Away scenario",
                     "partition_home": "Home partitions",
-                    "partition_night": "Night partitions"
+                    "scenario_home": "Home scenario",
+                    "partition_night": "Night partitions",
+                    "scenario_night": "Night scenario"
                 },
                 "data_description": {
+                    "scenario_disarm": "Select the scenario to activate to disarm",
                     "partition_away": "Select all partitions that need to armed for away state",
+                    "scenario_away": "Select the scenario to activate to arm away",
                     "partition_home": "Select all partitions that need to armed for home state",
-                    "partition_night": "Select all partitions that need to armed for night state"
+                    "scenario_home": "Select the scenario to activate to arm home",
+                    "partition_night": "Select all partitions that need to armed for night state",
+                    "scenario_night": "Select the scenario to activate to arm night"
                 }
             }
         }
-    }
+    },
+    "title": "Ksenia Lares Alarm"
 }
