@@ -8,11 +8,12 @@
   "dependencies": [],
   "documentation": "https://github.com/johnnybegood/ha-ksenia-lares",
   "homekit": {},
+  "iot_class": "local_polling",
   "requirements": [
     "lxml==4.9.1",
     "getmac==0.8.2"
   ],
   "ssdp": [],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "zeroconf": []
 }
