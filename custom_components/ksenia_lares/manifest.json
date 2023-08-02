@@ -1,18 +1,19 @@
 {
   "domain": "ksenia_lares",
   "name": "Ksenia Lares Alarm",
-  "version": "1.1.0",
+  "codeowners": [
+    "@johnnybegood"
+  ],
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/ksenia_lares",
+  "dependencies": [],
+  "documentation": "https://github.com/johnnybegood/ha-ksenia-lares",
+  "homekit": {},
+  "iot_class": "local_polling",
   "requirements": [
     "lxml==4.9.1",
     "getmac==0.8.2"
   ],
   "ssdp": [],
-  "zeroconf": [],
-  "homekit": {},
-  "dependencies": [],
-  "codeowners": [
-    "@johnnybegood"
-  ]
+  "version": "1.0.2",
+  "zeroconf": []
 }

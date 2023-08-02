@@ -18,6 +18,7 @@ from .const import (
     ZONE_BYPASS_ON,
     ZONE_STATUS_ALARM,
     ZONE_STATUS_NOT_USED,
+    DATA_COORDINATOR,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up binary sensors attached to a Lares alarm device from a config entry."""
 
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
     device_info = await coordinator.client.device_info()
     zone_descriptions = await coordinator.client.zone_descriptions()
 

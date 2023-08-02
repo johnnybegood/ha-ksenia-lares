@@ -1,5 +1,4 @@
 {
-  "title": "Ksenia Lares Alarm",
   "config": {
     "step": {
       "user": {
@@ -17,6 +16,31 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Link different alarm states to partition and scenarios.",
+        "data": {
+          "scenario_disarm": "Disarm scenario",
+          "partition_away": "Away paritions",
+          "scenario_away": "Away scenario",
+          "partition_home": "Home partitions",
+          "scenario_home": "Home scenario",
+          "partition_night": "Night partitions",
+          "scenario_night": "Night scenario"
+        },
+        "data_description": {
+          "scenario_disarm": "Select the scenario to activate to disarm",
+          "partition_away": "Select all partitions that need to armed for away state",
+          "scenario_away": "Select the scenario to activate to arm away",
+          "partition_home": "Select all partitions that need to armed for home state",
+          "scenario_home": "Select the scenario to activate to arm home",
+          "partition_night": "Select all partitions that need to armed for night state",
+          "scenario_night": "Select the scenario to activate to arm night"
+        }
+      }
     }
   }
 }

@@ -1,9 +1,7 @@
 """This component provides support for Lares partitions."""
 from datetime import timedelta
-import logging
 
-
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
@@ -12,12 +10,19 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DATA_PARTITIONS, ZONE_STATUS_NOT_USED
-
-_LOGGER = logging.getLogger(__name__)
+from .const import (
+    DOMAIN,
+    DATA_PARTITIONS,
+    PARTITION_STATUS_DISARMED,
+    PARTITION_STATUS_ARMED,
+    PARTITION_STATUS_ARMED_IMMEDIATE,
+    PARTITION_STATUS_ARMING,
+    PARTITION_STATUS_PENDING,
+    PARTITION_STATUS_ALARM,
+    DATA_COORDINATOR,
+)
 
 SCAN_INTERVAL = timedelta(seconds=10)
-
 DEFAULT_DEVICE_CLASS = "motion"
 
 
@@ -28,7 +33,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensors attached to a Lares alarm device from a config entry."""
 
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
     device_info = await coordinator.client.device_info()
     partition_descriptions = await coordinator.client.partition_descriptions()
 
@@ -52,7 +57,17 @@ class LaresSensor(CoordinatorEntity, SensorEntity):
         self._description = description
         self._idx = idx
 
+        self._attr_icon = "mdi:shield"
         self._attr_device_info = device_info
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_options = [
+            PARTITION_STATUS_DISARMED,
+            PARTITION_STATUS_ARMED,
+            PARTITION_STATUS_ARMED_IMMEDIATE,
+            PARTITION_STATUS_ARMING,
+            PARTITION_STATUS_PENDING,
+            PARTITION_STATUS_ALARM,
+        ]
 
         # Hide sensor if it has no description
         is_inactive = not self._description
