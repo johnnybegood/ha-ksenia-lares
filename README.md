@@ -1,10 +1,5 @@
 # Home Assistant Ksenia Lares integration
-
-[![GitHub Activity][commits-shield]][commits]
-[![License][license-shield]](LICENSE)
-
-[![hacs][hacsbadge]][hacs]
-![Project Maintenance][maintenance-shield]
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 Ksenia Lares 48IP integration for home assistant. This is integration is in early stages, use at own risk.
 
@@ -18,6 +13,9 @@ Platform | Description
 
 ## Installation
 ### Installation via HACS
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=johnnybegood&repository=ha-ksenia-lares)
+
 1. Open HACS
 2. Goto the menu in to top right corner
 3. Goto custom respositories
