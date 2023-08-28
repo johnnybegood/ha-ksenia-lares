@@ -31,6 +31,7 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("host"): str,
+        vol.Required("port", default=4202): int,
         vol.Required("username"): str,
         vol.Required("password"): str,
     }
@@ -56,7 +57,7 @@ async def validate_input(hass: HomeAssistant, data):
 class LaresConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Ksenia Lares Alarm."""
 
-    VERSION = 1
+    VERSION = 2
 
     @staticmethod
     @callback
@@ -94,7 +95,6 @@ class LaresConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
         )
-
 
 class LaresOptionsFlowHandler(OptionsFlow):
     """Handle a options flow for Ksenia Lares Alarm."""

@@ -4,6 +4,7 @@
       "user": {
         "data": {
           "host": "[%key:common::config_flow::data::host%]",
+          "port": "[%key:common::config_flow::data::port%]",
           "username": "[%key:common::config_flow::data::username%]",
           "password": "[%key:common::config_flow::data::password%]"
         }
@@ -24,7 +25,7 @@
         "description": "Link different alarm states to partition and scenarios.",
         "data": {
           "scenario_disarm": "Disarm scenario",
-          "partition_away": "Away paritions",
+          "partition_away": "Away partitions",
           "scenario_away": "Away scenario",
           "partition_home": "Home partitions",
           "scenario_home": "Home scenario",

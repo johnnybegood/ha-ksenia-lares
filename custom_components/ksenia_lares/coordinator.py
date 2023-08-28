@@ -30,6 +30,6 @@ class LaresDataUpdateCoordinator(DataUpdateCoordinator):
         """Fetch data from Ksenia Lares client."""
         async with async_timeout.timeout(DEFAULT_TIMEOUT):
             zones = await self.client.zones()
-            partitions = await self.client.paritions()
+            partitions = await self.client.partitions()
 
             return {DATA_ZONES: zones, DATA_PARTITIONS: partitions}

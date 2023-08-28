@@ -12,6 +12,7 @@
             "user": {
                 "data": {
                     "host": "Host",
+                    "port": "Port",
                     "password": "Password",
                     "username": "Username"
                 }
@@ -24,7 +25,7 @@
                 "description": "Link partitions to states, the state will be set when the selected partitions are armed",
                 "data": {
                     "scenario_disarm": "Disarm scenario",
-                    "partition_away": "Away paritions",
+                    "partition_away": "Away partitions",
                     "scenario_away": "Away scenario",
                     "partition_home": "Home partitions",
                     "scenario_home": "Home scenario",
