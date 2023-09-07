@@ -19,10 +19,11 @@ class LaresBase:
         username = data["username"]
         password = data["password"]
         host = data["host"]
+        port = data["port"]
 
         self._auth = aiohttp.BasicAuth(username, password)
         self._ip = host
-        self._port = 4202
+        self._port = port
         self._host = f"http://{host}:{self._port}"
         self._zone_descriptions = None
         self._partition_descriptions = None
@@ -112,7 +113,7 @@ class LaresBase:
 
         return self._partition_descriptions
 
-    async def paritions(self):
+    async def partitions(self):
         """Get status of partitions"""
         response = await self.get("partitions/partitionsStatus48IP.xml")
 
