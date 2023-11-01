@@ -43,5 +43,12 @@
                 }
             }
         }
+    },
+    "entity": {
+        "switch": {
+            "bypass": {
+                "name": "Bypass"
+            }
+        }
     }
 }
