@@ -68,6 +68,7 @@ class LaresBase:
             "manufacturer": MANUFACTURER,
             "model": device_info["name"],
             "sw_version": f'{device_info["version"]}.{device_info["revision"]}.{device_info["build"]}',
+            "configuration_url": self._host
         }
 
         mac = device_info["mac"]
