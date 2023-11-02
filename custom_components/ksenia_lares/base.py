@@ -1,11 +1,11 @@
 """Base component for Lares"""
 import logging
 from typing import Any
-from xml.etree.ElementTree import Element
 
 import aiohttp
 from getmac import get_mac_address
 from lxml import etree
+from lxml.etree import Element
 
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, format_mac
 
@@ -27,11 +27,12 @@ class LaresBase:
         self._ip = host
         self._port = port
         self._host = f"http://{host}:{self._port}"
+        self._model = None
         self._zone_descriptions = None
         self._partition_descriptions = None
         self._scenario_descriptions = None
 
-    async def info(self):
+    async def info(self) -> dict | None:
         """Get general info"""
         response = await self.get("info/generalInfo.xml")
 
@@ -57,7 +58,7 @@ class LaresBase:
 
         return info
 
-    async def device_info(self):
+    async def device_info(self) -> dict | None:
         """Get device info"""
         device_info = await self.info()
 
@@ -82,16 +83,18 @@ class LaresBase:
 
     async def zone_descriptions(self):
         """Get available zones"""
+        model = await self.get_model()
         if self._zone_descriptions is None:
             self._zone_descriptions = await self.get_descriptions(
-                "zones/zonesDescription48IP.xml", "/zonesDescription/zone"
+                f"zones/zonesDescription{model}.xml", "/zonesDescription/zone"
             )
 
         return self._zone_descriptions
 
     async def zones(self):
         """Get available zones"""
-        response = await self.get("zones/zonesStatus48IP.xml")
+        model = await self.get_model()
+        response = await self.get(f"zones/zonesStatus{model}.xml")
 
         if response is None:
             return None
@@ -108,9 +111,11 @@ class LaresBase:
 
     async def partition_descriptions(self):
         """Get available partitions"""
+        model = await self.get_model()
+
         if self._partition_descriptions is None:
             self._partition_descriptions = await self.get_descriptions(
-                "partitions/partitionsDescription48IP.xml",
+                f"partitions/partitionsDescription{model}.xml",
                 "/partitionsDescription/partition",
             )
 
@@ -118,7 +123,8 @@ class LaresBase:
 
     async def partitions(self):
         """Get status of partitions"""
-        response = await self.get("partitions/partitionsStatus48IP.xml")
+        model = await self.get_model()
+        response = await self.get(f"partitions/partitionsStatus{model}.xml")
 
         if response is None:
             return None
@@ -176,7 +182,7 @@ class LaresBase:
 
         return await self.send_command("setByPassZone", code, params)
 
-    async def get_descriptions(self, path: str, element: str) -> dict:
+    async def get_descriptions(self, path: str, element: str) -> dict | None:
         """Get descriptions"""
         response = await self.get(path)
 
@@ -185,6 +191,19 @@ class LaresBase:
 
         content = response.xpath(element)
         return [item.text for item in content]
+
+    async def get_model(self) -> str:
+        """Get model information"""
+        if self._model is None:
+            info = await self.info()
+            if info["name"].endswith("128IP"):
+                self._model = "128IP"
+            elif info["name"].endswith("48IP"):
+                self._model = "48IP"
+            else:
+                self._model = "16IP"
+
+        return self._model
 
     async def send_command(self, command: str, code: str, params: dict[str, int]) -> bool:
         """Send Command"""
@@ -217,4 +236,4 @@ class LaresBase:
             _LOGGER.debug("Host %s: Connection error %s", self._host, str(conn_err))
         except:  # pylint: disable=bare-except
             _LOGGER.debug("Host %s: Unknown exception occurred", self._host)
-        return
+        return None
