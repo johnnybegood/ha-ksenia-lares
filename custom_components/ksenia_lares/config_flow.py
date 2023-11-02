@@ -24,6 +24,7 @@ from .const import (
     CONF_SCENARIO_AWAY,
     CONF_SCENARIO_NIGHT,
     CONF_SCENARIO_DISARM,
+    CONF_PIN
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -118,6 +119,7 @@ class LaresOptionsFlowHandler(OptionsFlow):
         scenarios_with_empty = [""] + scenarios
 
         options = {
+            vol.Optional(CONF_PIN): str,
             vol.Required(
                 CONF_SCENARIO_DISARM,
                 default=self.config_entry.options.get(CONF_SCENARIO_DISARM, ""),
