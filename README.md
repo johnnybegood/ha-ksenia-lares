@@ -1,7 +1,7 @@
 # Home Assistant Ksenia Lares integration
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-Ksenia Lares 48IP integration for home assistant. This is integration is in early stages, use at own risk.
+Ksenia Lares 48IP integration for home assistant. Compatible with BTicino alarm systems.
 
 **This integration will set up the following platforms.**
 
@@ -9,7 +9,11 @@ Platform | Description
 -- | --
 `binary_sensor` | For each zone, defaults to movement sensor.
 `sensor` | For each partition, showing the ARM status. 
-`alarm_panel` | ARM and disarm based on partitions and scenarios
+`alarm_control_panel` | ARM and disarm based on partitions and scenarios
+`switch` | Bypass zones/partitions
+
+## Requirements
+This integration relies on the web interface to be activated, this is not always the case. Please contact your alarm intaller for more information on activation.
 
 ## Installation
 ### Installation via HACS
@@ -39,20 +43,15 @@ Platform | Description
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=ksenia_lares)
 
-## Quickstart
-1. Check your Ksenia Lares has the web interface running
-2. Enter the following information from Ksenia Lares 48IP web interface:
-   1. Hostname or IP adress (port 4202 will be used)
-   2. Username
-   3. Password
-3. To be able to use the alarm panel, click the 'configure' button on the Ksenia Lares [integration](https://my.home-assistant.io/redirect/integrations/)
-4.  Select the partitions and scenarios that match different ARM states.
-    1.  When the selected partitions are armed, the alarm panel will show the corresponding state.
-    2.  The selected scenario will be activated when changing arm state of the alarm panel
+## Configuration
+### Mapping Alarm
+The KSENIA Lares alarm uses more complex scenarios then the default states of the home assistant alarm (away, night, home). A mapping is needed between the Home Assistant states and the KSENIA Lares scenarios (for activation) and zones/partitions (for state).
 
-## WIP
-- [x] Detect zones from Lares alarm system and show as binary sensor 
-- [ ] Integrate with alarm panel in Home Assistant
-- [ ] Add logo
-- [ ] Improve configuration
-- [ ] Move SDK/API to seperate repo
+Go to [integration](https://my.home-assistant.io/redirect/integration/?domain=ksenia_lares) to setup the mapping. 
+
+### Bypass zones
+To be able to bypass zones, you will need to configure a PIN to be used. 
+
+1. Go to [integration](https://my.home-assistant.io/redirect/integration/?domain=ksenia_lares)
+2. Click 'Configure'
+3. Enter the PIN code to use (it will need to be entered again each time the configuration screen is used).
