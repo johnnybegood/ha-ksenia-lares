@@ -24,6 +24,7 @@
             "init": {
                 "description": "Link partitions to states, the state will be set when the selected partitions are armed",
                 "data": {
+                    "pin": "PIN",
                     "scenario_disarm": "Disarm scenario",
                     "partition_away": "Away partitions",
                     "scenario_away": "Away scenario",
@@ -33,6 +34,7 @@
                     "scenario_night": "Night scenario"
                 },
                 "data_description": {
+                    "pin": "PIN to use for zone/partition bypass",
                     "scenario_disarm": "Select the scenario to activate to disarm",
                     "partition_away": "Select all partitions that need to armed for away state",
                     "scenario_away": "Select the scenario to activate to arm away",
@@ -41,6 +43,13 @@
                     "partition_night": "Select all partitions that need to armed for night state",
                     "scenario_night": "Select the scenario to activate to arm night"
                 }
+            }
+        }
+    },
+    "entity": {
+        "switch": {
+            "bypass": {
+                "name": "Bypass"
             }
         }
     }

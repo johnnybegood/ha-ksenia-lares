@@ -93,4 +93,4 @@ class LaresBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Return True if entity is available."""
         status = self._coordinator.data[DATA_ZONES][self._idx]["status"]
 
-        return status != ZONE_STATUS_NOT_USED or status == ZONE_BYPASS_ON
+        return status != ZONE_STATUS_NOT_USED

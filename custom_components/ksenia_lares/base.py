@@ -1,5 +1,7 @@
 """Base component for Lares"""
 import logging
+from typing import Any
+from xml.etree.ElementTree import Element
 
 import aiohttp
 from getmac import get_mac_address
@@ -68,6 +70,7 @@ class LaresBase:
             "manufacturer": MANUFACTURER,
             "model": device_info["name"],
             "sw_version": f'{device_info["version"]}.{device_info["revision"]}.{device_info["build"]}',
+            "configuration_url": self._host
         }
 
         mac = device_info["mac"]
@@ -158,15 +161,20 @@ class LaresBase:
 
     async def activate_scenario(self, scenario: int, code: str) -> bool:
         """Activate the given scenarios, requires the alarm code"""
-        path = f"cmd/cmdOk.xml?cmd=setMacro&pin={code}&macroId={scenario}&redirectPage=/xml/cmd/cmdError.xml"
-        response = await self.get(path)
-        cmd = response.xpath("/cmd")
+        params = {
+            "macroId": scenario
+        }
 
-        if cmd is None or cmd[0].text != "cmdSent":
-            _LOGGER.error("Active scenario failed: %s", response)
-            return False
+        return await self.send_command("setMacro", code, params)
 
-        return True
+    async def bypass_zone(self, zone: int, code: str, bypass: bool) -> bool:
+        """Activate the given scenarios, requires the alarm code"""
+        params = {
+            "zoneId": zone + 1, #Lares uses index starting with 1
+            "zoneValue": 1 if bypass else 0
+        }
+
+        return await self.send_command("setByPassZone", code, params)
 
     async def get_descriptions(self, path: str, element: str) -> dict:
         """Get descriptions"""
@@ -177,6 +185,22 @@ class LaresBase:
 
         content = response.xpath(element)
         return [item.text for item in content]
+
+    async def send_command(self, command: str, code: str, params: dict[str, int]) -> bool:
+        """Send Command"""
+        urlparam = "".join(f'&{k}={v}' for k,v in params.items())
+        path = f"cmd/cmdOk.xml?cmd={command}&pin={code}&redirectPage=/xml/cmd/cmdError.xml{urlparam}"
+
+        _LOGGER.debug("Sending command %s", path)
+
+        response = await self.get(path)
+        cmd = response.xpath("/cmd")
+
+        if cmd is None or cmd[0].text != "cmdSent":
+            _LOGGER.error("Command send failed: %s", response)
+            return False
+
+        return True
 
     async def get(self, path):
         """Generic send method."""

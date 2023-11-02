@@ -1,3 +1,9 @@
 .DS_Store
 .vscode
 captured
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
