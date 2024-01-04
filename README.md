@@ -23,7 +23,7 @@ This integration relies on the web interface to be activated, this is not always
 1. Open HACS
 2. Goto the menu in to top right corner
 3. Goto custom respositories
-4. Add this repositry `https://github.com/johnnybegood/ha-ksenia-lares`
+4. Add this repositry `https://github.com/DeltaFox0018/ha-ksenia-lares`
 5. Click _explore & download respositories_
 6. Search for and add "Ksenia Lares"
 7. Restart Home Assistant
