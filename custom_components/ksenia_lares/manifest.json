@@ -12,7 +12,7 @@
   "issue_tracker": "https://github.com/johnnybegood/ha-ksenia-lares/issues",
   "requirements": [
     "lxml==4.9.4",
-    "getmac==0.8.2"
+    "getmac==0.9.4"
   ],
   "ssdp": [],
   "version": "1.0.2",
