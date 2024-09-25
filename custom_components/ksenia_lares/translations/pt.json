@@ -1,0 +1,56 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "O dispositivo já está configurado"
+        },
+        "error": {
+            "cannot_connect": "Falha ao conectar",
+            "invalid_auth": "Autenticação inválida",
+            "unknown": "Erro inesperado"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Host",
+                    "port": "Porta",
+                    "password": "Palavra-passe",
+                    "username": "Nome de utilizador"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Associar partições aos estados, o estado será definido quando as partições selecionadas forem armadas",
+                "data": {
+                    "pin": "PIN",
+                    "scenario_disarm": "Cenário de desarmar",
+                    "partition_away": "Partições em modo fora",
+                    "scenario_away": "Cenário para modo fora",
+                    "partition_home": "Partições em modo casa",
+                    "scenario_home": "Cenário para modo casa",
+                    "partition_night": "Partições em modo noite",
+                    "scenario_night": "Cenário para modo noite"
+                },
+                "data_description": {
+                    "pin": "PIN a ser utilizado para ignorar zona/partição",
+                    "scenario_disarm": "Selecione o cenário a ativar para desarmar",
+                    "partition_away": "Selecione todas as partições que precisam de ser armadas para o estado fora",
+                    "scenario_away": "Selecione o cenário a ativar para armar no modo fora",
+                    "partition_home": "Selecione todas as partições que precisam de ser armadas para o estado casa",
+                    "scenario_home": "Selecione o cenário a ativar para armar no modo casa",
+                    "partition_night": "Selecione todas as partições que precisam de ser armadas para o estado noite",
+                    "scenario_night": "Selecione o cenário a ativar para armar no modo noite"
+                }
+            }
+        }
+    },
+    "entity": {
+        "switch": {
+            "bypass": {
+                "name": "Ignorar"
+            }
+        }
+    }
+}
