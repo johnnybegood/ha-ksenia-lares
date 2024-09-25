@@ -1,5 +1,8 @@
+[![hacs][hacs-shield]][hacs-url]
+[![GitHub Release][releases-shield]](releases)
+[![License][license-shield]](LICENSE)
+
 # Home Assistant Ksenia Lares integration
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 Ksenia Lares 48IP integration for home assistant. Compatible with BTicino alarm systems.
 
@@ -18,14 +21,10 @@ This integration relies on the web interface to be activated, this is not always
 ## Installation
 ### Installation via HACS
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=johnnybegood&repository=ha-ksenia-lares)
+This integration is available in [HACS][hacs-url] (Home Assistant Community Store).
 
 1. Open HACS
-2. Goto the menu in to top right corner
-3. Goto custom respositories
-4. Add this repositry `https://github.com/johnnybegood/ha-ksenia-lares`
-5. Click _explore & download respositories_
-6. Search for and add "Ksenia Lares"
+2. Search for and add "Ksenia Lares"
 7. Restart Home Assistant
 8. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Ksenia Lares" or click the button below.
 
@@ -55,3 +54,9 @@ To be able to bypass zones, you will need to configure a PIN to be used.
 1. Go to [integration](https://my.home-assistant.io/redirect/integration/?domain=ksenia_lares)
 2. Click 'Configure'
 3. Enter the PIN code to use (it will need to be entered again each time the configuration screen is used).
+
+[releases-shield]: https://img.shields.io/github/v/release/johnnybegood/ha-ksenia-lares
+[license-shield]: https://img.shields.io/github/license/johnnybegood/ha-ksenia-lares
+[hacs-shield]: https://img.shields.io/badge/hacs-default-orange.svg
+[hacs-url]: https://hacs.xyz/
+
