@@ -1,41 +1,33 @@
-"""This component provides support for Lares alarm  control panel."""
-import logging
+"""Component to interface with a Lares Ksenia alarm control panel."""
+
 from datetime import timedelta
+import logging
 
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     AlarmControlPanelEntityFeature,
+    AlarmControlPanelState,
     CodeFormat,
 )
-
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from homeassistant.const import (
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_DISARMED,
-    STATE_ALARM_ARMED_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    STATE_ALARM_ARMING,
-)
-
-from .coordinator import LaresDataUpdateCoordinator
 from .const import (
-    DOMAIN,
-    DATA_COORDINATOR,
-    DATA_PARTITIONS,
-    PARTITION_STATUS_ARMED,
-    PARTITION_STATUS_ARMED_IMMEDIATE,
-    PARTITION_STATUS_ARMING,
     CONF_PARTITION_AWAY,
     CONF_PARTITION_HOME,
     CONF_PARTITION_NIGHT,
     CONF_SCENARIO_AWAY,
+    CONF_SCENARIO_DISARM,
     CONF_SCENARIO_HOME,
     CONF_SCENARIO_NIGHT,
-    CONF_SCENARIO_DISARM,
+    DATA_COORDINATOR,
+    DATA_PARTITIONS,
+    DOMAIN,
+    PARTITION_STATUS_ARMED,
+    PARTITION_STATUS_ARMED_IMMEDIATE,
+    PARTITION_STATUS_ARMING,
 )
+from .coordinator import LaresDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=10)
@@ -132,22 +124,22 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
     def state(self) -> StateType:
         """Return the state of this panel."""
         if self.__has_partition_with_status(PARTITION_STATUS_ARMING):
-            return STATE_ALARM_ARMING
+            return AlarmControlPanelState.ARMING
 
         if self.__is_armed(CONF_PARTITION_AWAY):
-            return STATE_ALARM_ARMED_AWAY
+            return AlarmControlPanelState.ARMED_AWAY
 
         if self.__is_armed(CONF_PARTITION_HOME):
-            return STATE_ALARM_ARMED_HOME
+            return AlarmControlPanelState.ARMED_HOME
 
         if self.__is_armed(CONF_PARTITION_NIGHT):
-            return STATE_ALARM_ARMED_NIGHT
+            return AlarmControlPanelState.ARMED_NIGHT
 
         # If any of the not mapped partitions is armed, show custom as fallback
         if self.__has_partition_with_status(self.ARMED_STATUS):
-            return STATE_ALARM_ARMED_CUSTOM_BYPASS
+            return AlarmControlPanelState.ARMED_CUSTOM_BYPASS
 
-        return STATE_ALARM_DISARMED
+        return AlarmControlPanelState.DISARMED
 
     async def async_alarm_arm_home(self, code: str | None = None) -> None:
         """Send arm home command."""
@@ -168,9 +160,9 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
     def __has_partition_with_status(self, status_list: list[str]) -> bool:
         """Return if any partitions is arming."""
         partitions = enumerate(self._coordinator.data[DATA_PARTITIONS])
-        in_state = list(
+        in_state = [
             idx for idx, partition in partitions if partition["status"] in status_list
-        )
+        ]
 
         _LOGGER.debug("%s in status %s", in_state, status_list)
 
