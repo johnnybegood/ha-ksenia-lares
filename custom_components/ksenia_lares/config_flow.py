@@ -24,7 +24,9 @@ from .const import (
     CONF_SCENARIO_AWAY,
     CONF_SCENARIO_NIGHT,
     CONF_SCENARIO_DISARM,
-    CONF_PIN
+    CONF_PIN,
+    CONF_SCAN_INTERVAL,
+    DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -120,6 +122,10 @@ class LaresOptionsFlowHandler(OptionsFlow):
 
         options = {
             vol.Optional(CONF_PIN): str,
+            vol.Optional(
+                CONF_SCAN_INTERVAL,
+                default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            ): vol.All(int, vol.Range(min=5, max=300)),
             vol.Required(
                 CONF_SCENARIO_DISARM,
                 default=self.config_entry.options.get(CONF_SCENARIO_DISARM, ""),

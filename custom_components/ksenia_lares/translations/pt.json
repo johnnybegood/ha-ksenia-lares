@@ -35,6 +35,7 @@
                 },
                 "data_description": {
                     "pin": "PIN a ser utilizado para ignorar zona/partição",
+                    "scan_interval": "Frequência (em segundos) com que o painel é consultado para atualizar o estado. Mínimo 5 s (abaixo do tempo limite de rede de 10 s) para evitar pedidos sobrepostos.",
                     "scenario_disarm": "Selecione o cenário a ativar para desarmar",
                     "partition_away": "Selecione todas as partições que precisam de ser armadas para o estado fora",
                     "scenario_away": "Selecione o cenário a ativar para armar no modo fora",

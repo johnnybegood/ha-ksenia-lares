@@ -1,0 +1,58 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Il dispositivo è già configurato"
+        },
+        "error": {
+            "cannot_connect": "Connessione non riuscita",
+            "invalid_auth": "Autenticazione non valida",
+            "unknown": "Errore imprevisto"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Host",
+                    "port": "Porta",
+                    "password": "Password",
+                    "username": "Nome utente"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Associa le partizioni agli stati, lo stato verrà impostato quando le partizioni selezionate sono inserite",
+                "data": {
+                    "pin": "PIN",
+                    "scan_interval": "Intervallo di polling (secondi)",
+                    "scenario_disarm": "Scenario di disinserimento",
+                    "partition_away": "Partizioni modalità fuori casa",
+                    "scenario_away": "Scenario modalità fuori casa",
+                    "partition_home": "Partizioni modalità casa",
+                    "scenario_home": "Scenario modalità casa",
+                    "partition_night": "Partizioni modalità notte",
+                    "scenario_night": "Scenario modalità notte"
+                },
+                "data_description": {
+                    "pin": "PIN da utilizzare per l'esclusione di zone/partizioni",
+                    "scan_interval": "Ogni quanti secondi interrogare il pannello per aggiornare lo stato. Minimo 5 s (inferiore al timeout di rete di 10 s) per evitare richieste sovrapposte.",
+                    "scenario_disarm": "Seleziona lo scenario da attivare per disinserire",
+                    "partition_away": "Seleziona tutte le partizioni che devono essere inserite per lo stato fuori casa",
+                    "scenario_away": "Seleziona lo scenario da attivare per inserire la modalità fuori casa",
+                    "partition_home": "Seleziona tutte le partizioni che devono essere inserite per lo stato casa",
+                    "scenario_home": "Seleziona lo scenario da attivare per inserire la modalità casa",
+                    "partition_night": "Seleziona tutte le partizioni che devono essere inserite per lo stato notte",
+                    "scenario_night": "Seleziona lo scenario da attivare per inserire la modalità notte"
+                }
+            }
+        }
+    },
+    "entity": {
+        "switch": {
+            "bypass": {
+                "name": "Esclusione"
+            }
+        }
+    }
+}
