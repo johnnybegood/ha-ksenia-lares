@@ -66,7 +66,7 @@ class LaresConfigFlow(ConfigFlow, domain=DOMAIN):
         config_entry: ConfigEntry,
     ) -> OptionsFlow:
         """Return the options flow."""
-        return LaresOptionsFlowHandler(config_entry)
+        return LaresOptionsFlowHandler()
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
@@ -100,11 +100,6 @@ class LaresConfigFlow(ConfigFlow, domain=DOMAIN):
 class LaresOptionsFlowHandler(OptionsFlow):
     """Handle a options flow for Ksenia Lares Alarm."""
 
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-        self.client = LaresBase(config_entry.data)
-
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
@@ -112,10 +107,12 @@ class LaresOptionsFlowHandler(OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        partitions = await self.client.partition_descriptions()
+        client = LaresBase(self.config_entry.data)
+
+        partitions = await client.partition_descriptions()
         select_partitions = {v: v for v in list(filter(None, partitions)) if v != ""}
 
-        scenarios = await self.client.scenario_descriptions()
+        scenarios = await client.scenario_descriptions()
         scenarios_with_empty = [""] + scenarios
 
         options = {
