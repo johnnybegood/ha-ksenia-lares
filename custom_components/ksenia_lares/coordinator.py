@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .base import LaresBase
-from .const import DEFAULT_TIMEOUT, DATA_PARTITIONS, DATA_ZONES
+from .const import DEFAULT_TIMEOUT, DATA_PARTITIONS, DATA_ZONES, DATA_OUTPUTS
 
 SCAN_INTERVAL = timedelta(seconds=10)
 _LOGGER = logging.getLogger(__name__)
@@ -31,5 +31,10 @@ class LaresDataUpdateCoordinator(DataUpdateCoordinator):
         async with async_timeout.timeout(DEFAULT_TIMEOUT):
             zones = await self.client.zones()
             partitions = await self.client.partitions()
+            outputs = await self.client.outputs()
 
-            return {DATA_ZONES: zones, DATA_PARTITIONS: partitions}
+            return {
+                DATA_ZONES: zones,
+                DATA_PARTITIONS: partitions,
+                DATA_OUTPUTS: outputs,
+            }

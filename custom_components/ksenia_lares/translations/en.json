@@ -34,7 +34,7 @@
                     "scenario_night": "Night scenario"
                 },
                 "data_description": {
-                    "pin": "PIN to use for zone/partition bypass",
+                    "pin": "PIN to use for zone/partition bypass and output control",
                     "scenario_disarm": "Select the scenario to activate to disarm",
                     "partition_away": "Select all partitions that need to armed for away state",
                     "scenario_away": "Select the scenario to activate to arm away",

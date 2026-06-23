@@ -34,7 +34,7 @@
                     "scenario_night": "Cenário para modo noite"
                 },
                 "data_description": {
-                    "pin": "PIN a ser utilizado para ignorar zona/partição",
+                    "pin": "PIN a ser utilizado para ignorar zona/partição e controlar saídas",
                     "scenario_disarm": "Selecione o cenário a ativar para desarmar",
                     "partition_away": "Selecione todas as partições que precisam de ser armadas para o estado fora",
                     "scenario_away": "Selecione o cenário a ativar para armar no modo fora",
