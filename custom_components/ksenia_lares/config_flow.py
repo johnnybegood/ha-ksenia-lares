@@ -102,7 +102,6 @@ class LaresOptionsFlowHandler(OptionsFlow):
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
         self.client = LaresBase(config_entry.data)
 
     async def async_step_init(
