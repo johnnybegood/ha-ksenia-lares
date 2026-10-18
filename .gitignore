@@ -7,3 +7,10 @@ captured
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Local test environments and reports
+.venv*/
+.pytest_cache/
+.coverage*
+coverage*.xml
+htmlcov/

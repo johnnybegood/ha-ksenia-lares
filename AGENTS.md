@@ -12,7 +12,7 @@ stored configuration, alarm behavior, and repository conventions.
 - Platform modules: alarm control panel, binary sensors, sensors and switches.
 - `manifest.json`: integration version and Python dependencies.
 - Root `hacs.json`: HACS metadata and minimum Home Assistant version.
-- `.github/workflows/main.yml`: separate hassfest and HACS validation jobs.
+- `.github/workflows/main.yml`: hassfest, HACS validation and pytest matrix jobs.
 
 ## Default skill: Ponytail
 
@@ -102,9 +102,10 @@ Authoritative references:
 - Preserve valid JSON, manifest domain, integration version and HACS metadata.
   Bump release versions only as part of requested release work.
 - Use existing tests/scripts if present. For non-trivial behavior changes, add focused
-  regression coverage using mocked panel responses. Do not invent commands for a
-  test harness that this repository does not have.
-- After pushing, inspect **both** `validate` (hassfest) and `HACS Action` for the
+  regression coverage using mocked panel responses. See `tests/README.md` for the
+  pytest harness and minimum/current HA environments. Run both for compatibility
+  changes; never use a real panel in automated tests.
+- After pushing, inspect `validate` (hassfest), `HACS Action` and both test jobs for the
   latest PR head SHA. If failing, inspect logs, fix in scope and check the new SHA.
   A previous green run does not validate a newer commit.
 - Do not disable checks to obtain green CI. Moving upstream validators can expose
