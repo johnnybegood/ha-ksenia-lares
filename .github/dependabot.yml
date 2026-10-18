@@ -9,3 +9,4 @@ updates:
       # pytest-homeassistant-custom-component versions for different Python
       # compatibility targets. Upgrade each pair together, manually.
       - dependency-name: "homeassistant"
+      - dependency-name: "pytest-homeassistant-custom-component"
