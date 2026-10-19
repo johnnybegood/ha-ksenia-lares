@@ -36,7 +36,7 @@
                 },
                 "data_description": {
                     "pin": "PIN da utilizzare per l'esclusione di zone/partizioni",
-                    "scan_interval": "Ogni quanti secondi interrogare il pannello per aggiornare lo stato. Minimo 5 s (inferiore al timeout di rete di 10 s) per evitare richieste sovrapposte.",
+                    "scan_interval": "Ogni quanti secondi interrogare il pannello. Intervalli più brevi aumentano il traffico verso il pannello; intervalli più lunghi ritardano l'aggiornamento di allarme, partizioni ed esclusioni, e le attivazioni brevi delle zone possono non essere rilevate tra un'interrogazione e l'altra.",
                     "scenario_disarm": "Seleziona lo scenario da attivare per disinserire",
                     "partition_away": "Seleziona tutte le partizioni che devono essere inserite per lo stato fuori casa",
                     "scenario_away": "Seleziona lo scenario da attivare per inserire la modalità fuori casa",

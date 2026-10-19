@@ -36,7 +36,7 @@
                 },
                 "data_description": {
                     "pin": "PIN to use for zone/partition bypass",
-                    "scan_interval": "How often (in seconds) to poll the panel for status updates. Minimum 5 s (below the 10 s network timeout) to avoid overlapping requests.",
+                    "scan_interval": "How often (in seconds) to poll the panel. Shorter intervals increase traffic to the panel; longer intervals delay alarm, partition and bypass status updates, and brief zone activations can be missed between polls.",
                     "scenario_disarm": "Select the scenario to activate to disarm",
                     "partition_away": "Select all partitions that need to armed for away state",
                     "scenario_away": "Select the scenario to activate to arm away",

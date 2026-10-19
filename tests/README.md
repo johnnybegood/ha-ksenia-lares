@@ -38,15 +38,16 @@ claim of full integration coverage; there is no arbitrary percentage gate.
 - User setup, invalid authentication and unexpected setup errors.
 - Opening options with existing defaults, without exposing the saved PIN in the
   form; saving explicitly supplied options.
+- Keeping the saved PIN when the options form leaves it omitted or blank, and the
+  configurable polling interval: default for older entries, range and reload.
 - Real setup of all four existing platforms, scheduled polling, cleanup after
   unload, and an options-triggered reload without duplicate registry entries.
 - Scenario and zone bypass/unbypass commands, successful and rejected responses:
   the outgoing request contains the synthetic PIN but debug logs do not.
 
-PIN preservation when the field is omitted or blank is **not** asserted here;
-that behavior belongs to PR #49. Output-control changes in PR #48 also need their
-own regression cases. Add them with the corresponding fixes, so tests describe
-the intended behavior rather than enshrine existing defects.
+Output-control changes in PR #48 also need their own regression cases. Add them
+with the corresponding fixes, so tests describe the intended behavior rather than
+enshrine existing defects.
 
 ## Maintaining the suite
 

@@ -111,6 +111,10 @@ class LaresOptionsFlowHandler(OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
+            # The saved PIN is never shown in the form: keep it when the field
+            # is left empty, otherwise saving other options would erase it.
+            if not user_input.get(CONF_PIN) and self.config_entry.options.get(CONF_PIN):
+                user_input[CONF_PIN] = self.config_entry.options[CONF_PIN]
             return self.async_create_entry(title="", data=user_input)
 
         partitions = await self.client.partition_descriptions()
