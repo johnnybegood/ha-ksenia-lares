@@ -14,6 +14,56 @@ stored configuration, alarm behavior, and repository conventions.
 - Root `hacs.json`: HACS metadata and minimum Home Assistant version.
 - `.github/workflows/main.yml`: hassfest, HACS validation and pytest matrix jobs.
 
+## Architecture
+
+The integration polls the panel's HTTP web interface (`local_polling`, no push):
+XML documents under `http://<host>:<port>/xml/...` with HTTP Basic Auth. The
+installer must enable the panel's web interface, which is often disabled by default.
+
+- `LaresBase` (`base.py`) is the only code that talks to the panel. Reads go
+  through `get(path)`, which returns a parsed `lxml` tree or `None` on any error
+  (errors are logged at debug, not raised). Commands go through `send_command()`
+  (`cmd/cmdOk.xml?cmd=...&pin=...`); never log that URL.
+- `LaresDataUpdateCoordinator` polls zones and partitions every `scan_interval`
+  seconds (options flow, default 10). Its `.data` dict is the single source of
+  truth for all entities, which are `CoordinatorEntity` subclasses created from
+  the one config entry: a motion `binary_sensor` per zone (on when `ALARM`), an
+  enum `sensor` per partition, one `alarm_control_panel`, and a bypass `switch`
+  per zone.
+
+### HA alarm states, scenarios and partitions
+
+The options flow maps each HA state (away/home/night/disarmed) to two different
+things; keep them distinct:
+
+- Arming and disarming activate a configured **scenario**: its name is resolved to
+  an index in `scenario_descriptions()` and passed to `activate_scenario()`.
+  A state is only offered when its scenario is configured.
+- The displayed state is read from **partitions**: a state applies when all of its
+  mapped partitions are armed; otherwise the panel reports `ARMED_CUSTOM_BYPASS`.
+
+Arm/disarm use the code entered in the HA UI for each action. Zone bypass has no
+prompt and uses the PIN stored in the options; without it, bypass does nothing.
+
+### Conventions and gotchas
+
+- `get_model()` derives `16IP`/`48IP`/`128IP` from the product name; the suffix is
+  part of the zone/partition XML filenames (scenario files have none).
+- Entity unique IDs use the position in the XML lists (`lares_zones_{idx}`,
+  `lares_partitions_{idx}`, `lares_bypass_{idx}`), so reordering zones on the panel
+  shifts entities. Bypass commands send `zoneId = idx + 1` (the panel is 1-indexed);
+  everything else uses the 0-based list index.
+- Zones/partitions reported as `NOT_USED` are still created, but disabled and
+  hidden by default in the entity registry.
+- Description lists are cached on `LaresBase`; status lists are fetched on every
+  poll. Panel reconfiguration needs an entry reload.
+- The device identifier is the panel MAC (via `getmac`), or `host:port` when the
+  MAC cannot be resolved.
+- `async_migrate_entry` upgrades v1 entries to v2 by adding `port=4202`. Bump
+  `ConfigFlow.VERSION` and extend it for any future stored-data change.
+- Manual check: copy `custom_components/ksenia_lares/` into a Home Assistant
+  `config/custom_components/`, restart and add the integration from the UI.
+
 ## Default skill: Ponytail
 
 Use **Ponytail full** by default for every coding, review, dependency and maintenance

@@ -25,6 +25,7 @@
                 "description": "Associar partições aos estados, o estado será definido quando as partições selecionadas forem armadas",
                 "data": {
                     "pin": "PIN",
+                    "scan_interval": "Intervalo de consulta (segundos)",
                     "scenario_disarm": "Cenário de desarmar",
                     "partition_away": "Partições em modo fora",
                     "scenario_away": "Cenário para modo fora",
@@ -35,6 +36,7 @@
                 },
                 "data_description": {
                     "pin": "PIN a ser utilizado para ignorar zona/partição",
+                    "scan_interval": "Frequência (em segundos) com que o painel é consultado. Intervalos mais curtos aumentam o tráfego para o painel; intervalos mais longos atrasam a atualização do alarme, das partições e das zonas ignoradas, e ativações breves de zonas podem não ser detetadas entre consultas.",
                     "scenario_disarm": "Selecione o cenário a ativar para desarmar",
                     "partition_away": "Selecione todas as partições que precisam de ser armadas para o estado fora",
                     "scenario_away": "Selecione o cenário a ativar para armar no modo fora",
