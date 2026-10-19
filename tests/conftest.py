@@ -28,6 +28,10 @@ def panel():
     client.scenario_descriptions.return_value = ["Disarm", "Away", "Home"]
     client.zones.return_value = [{"status": "NORMAL", "bypass": "UN_BYPASS"}]
     client.partitions.return_value = [{"status": "DISARMED"}]
+    client.output_descriptions.return_value = ["Test output"]
+    client.outputs.return_value = [
+        {"status": "OFF", "type": "DIGITAL", "value": "0", "noPin": False, "remoteControl": True}
+    ]
     with (
         patch("custom_components.ksenia_lares.LaresBase", return_value=client),
         patch("custom_components.ksenia_lares.config_flow.LaresBase", return_value=client),

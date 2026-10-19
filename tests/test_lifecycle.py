@@ -14,7 +14,7 @@ async def test_setup_unload_stops_polling(hass, entry, panel):
     registry = er.async_get(hass)
     entities = er.async_entries_for_config_entry(registry, entry.entry_id)
     assert {entity.domain for entity in entities} == {"sensor", "binary_sensor", "switch", "alarm_control_panel"}
-    assert len(entities) == 4
+    assert len(entities) == 5
     coordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
     panel.zones.reset_mock()
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=15))

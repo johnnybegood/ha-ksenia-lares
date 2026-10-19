@@ -9,6 +9,7 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .coordinator import LaresDataUpdateCoordinator
@@ -43,17 +44,24 @@ async def async_setup_entry(
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
-    entities = [
+    async_add_entities(
         LaresBypassSwitch(coordinator, idx, zone_descriptions[idx], device_info, options)
         for idx, zone in enumerate(coordinator.data[DATA_ZONES])
-    ]
+    )
 
-    entities += [
-        LaresOutputSwitch(coordinator, idx, output_descriptions[idx], device_info, options)
-        for idx, output in enumerate(coordinator.data[DATA_OUTPUTS] or [])
-    ]
-
-    async_add_entities(entities)
+    # Outputs are optional: missing or short metadata must not prevent the
+    # bypass switches above, and each entity keeps its status-list index.
+    output_descriptions = output_descriptions or []
+    async_add_entities(
+        LaresOutputSwitch(
+            coordinator,
+            idx,
+            output_descriptions[idx] if idx < len(output_descriptions) else f"Output {idx + 1}",
+            device_info,
+            options,
+        )
+        for idx, output in enumerate(coordinator.data.get(DATA_OUTPUTS) or [])
+    )
 
 
 class LaresBypassSwitch(CoordinatorEntity, SwitchEntity):
@@ -124,43 +132,61 @@ class LaresOutputSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_device_info = device_info
         self._attr_name = description
 
-        output = self._coordinator.data[DATA_OUTPUTS][self._idx]
+        output = self._output
 
         # Only outputs that are in use and remotely controllable are shown by
         # default; everything else stays hidden+disabled in the registry.
-        is_controllable = (
-            output["type"] != OUTPUT_TYPE_NOT_USED and output["remoteControl"]
+        is_controllable = bool(
+            output
+            and output["type"] != OUTPUT_TYPE_NOT_USED
+            and output["remoteControl"]
         )
 
         self._attr_entity_registry_enabled_default = is_controllable
         self._attr_entity_registry_visible_default = is_controllable
 
     @property
+    def _output(self) -> dict | None:
+        """Return this output's latest status, or None when it is absent."""
+        outputs = (self._coordinator.data or {}).get(DATA_OUTPUTS)
+        if outputs is None or self._idx >= len(outputs):
+            return None
+        return outputs[self._idx]
+
+    @property
     def is_on(self) -> bool | None:
         """Return true if the output is on."""
-        status = self._coordinator.data[DATA_OUTPUTS][self._idx]["status"]
-        return status == OUTPUT_STATUS_ON
+        output = self._output
+        if output is None:
+            return None
+        return output["status"] == OUTPUT_STATUS_ON
 
     @property
     def available(self) -> bool:
-        """Return True if the output is in use."""
-        output = self._coordinator.data[DATA_OUTPUTS][self._idx]
-        return output["type"] != OUTPUT_TYPE_NOT_USED
+        """Return True if the last update succeeded and the output is in use."""
+        output = self._output
+        return (
+            super().available
+            and output is not None
+            and output["type"] != OUTPUT_TYPE_NOT_USED
+        )
 
     async def async_turn_on(self, **kwargs):
         """Turn the output on."""
-        if self._pin is None:
-            _LOGGER.error("Pin needed to control output")
-            return
-
-        await self._coordinator.client.set_output(self._idx, self._pin, True)
-        await self._coordinator.async_request_refresh()
+        await self._async_set_output(True)
 
     async def async_turn_off(self, **kwargs):
         """Turn the output off."""
-        if self._pin is None:
-            _LOGGER.error("Pin needed to control output")
-            return
+        await self._async_set_output(False)
 
-        await self._coordinator.client.set_output(self._idx, self._pin, False)
+    async def _async_set_output(self, turn_on: bool) -> None:
+        """Send the output command and surface failures to the caller."""
+        if self._pin is None:
+            raise ServiceValidationError(
+                "A PIN must be configured in the integration options to control outputs"
+            )
+
+        if not await self._coordinator.client.set_output(self._idx, self._pin, turn_on):
+            raise HomeAssistantError(f"The panel rejected the command for output {self._idx + 1}")
+
         await self._coordinator.async_request_refresh()
