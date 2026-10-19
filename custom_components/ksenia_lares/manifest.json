@@ -11,8 +11,8 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/johnnybegood/ha-ksenia-lares/issues",
   "requirements": [
-    "lxml==6.0.1",
-    "getmac==0.9.4"
+    "lxml>=6.1.2",
+    "getmac>=0.9.5"
   ],
   "ssdp": [],
   "version": "1.0.2",

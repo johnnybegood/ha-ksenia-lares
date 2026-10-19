@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Both test requirements files pin matching Home Assistant and
+      # pytest-homeassistant-custom-component versions for different Python
+      # compatibility targets. Upgrade each pair together, manually.
+      - dependency-name: "homeassistant"
+      - dependency-name: "pytest-homeassistant-custom-component"

@@ -210,7 +210,7 @@ class LaresBase:
         urlparam = "".join(f'&{k}={v}' for k,v in params.items())
         path = f"cmd/cmdOk.xml?cmd={command}&pin={code}&redirectPage=/xml/cmd/cmdError.xml{urlparam}"
 
-        _LOGGER.debug("Sending command %s", path)
+        _LOGGER.debug("Sending command %s", command)
 
         response = await self.get(path)
         cmd = response.xpath("/cmd")
