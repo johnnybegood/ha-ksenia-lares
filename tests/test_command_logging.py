@@ -15,6 +15,8 @@ from custom_components.ksenia_lares.base import LaresBase
         ("activate_scenario", (2,), "setMacro", "&macroId=2"),
         ("bypass_zone", (0, True), "setByPassZone", "&zoneId=1&zoneValue=1"),
         ("bypass_zone", (0, False), "setByPassZone", "&zoneId=1&zoneValue=0"),
+        ("set_output", (0, True), "setOutput", "&outputId=0&outputValue=255"),
+        ("set_output", (0, False), "setOutput", "&outputId=0&outputValue=0"),
     ],
 )
 async def test_pin_not_logged(caplog, status, method, arguments, command, parameters):

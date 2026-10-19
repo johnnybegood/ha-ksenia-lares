@@ -9,7 +9,7 @@ from lxml.etree import Element
 
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, format_mac
 
-from .const import DOMAIN, MANUFACTURER
+from .const import DOMAIN, MANUFACTURER, OUTPUT_ON_VALUE, OUTPUT_OFF_VALUE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +31,7 @@ class LaresBase:
         self._zone_descriptions = None
         self._partition_descriptions = None
         self._scenario_descriptions = None
+        self._output_descriptions = None
 
     async def info(self) -> dict | None:
         """Get general info"""
@@ -138,6 +139,38 @@ class LaresBase:
             for partition in partitions
         ]
 
+    async def output_descriptions(self):
+        """Get available outputs"""
+        model = await self.get_model()
+
+        if self._output_descriptions is None:
+            self._output_descriptions = await self.get_descriptions(
+                f"outputs/outputsDescription{model}.xml", "/outputsDescription/output"
+            )
+
+        return self._output_descriptions
+
+    async def outputs(self):
+        """Get status of outputs"""
+        model = await self.get_model()
+        response = await self.get(f"outputs/outputsStatus{model}.xml")
+
+        if response is None:
+            return None
+
+        outputs = response.xpath("/outputsStatus/output")
+
+        return [
+            {
+                "status": output.find("status").text,
+                "type": output.find("type").text,
+                "value": output.find("value").text,
+                "noPin": output.find("noPIN").text == "TRUE",
+                "remoteControl": output.find("remoteControl").text == "TRUE",
+            }
+            for output in outputs
+        ]
+
     async def scenarios(self):
         """Get status of scenarios"""
         response = await self.get("scenarios/scenariosOptions.xml")
@@ -181,6 +214,15 @@ class LaresBase:
         }
 
         return await self.send_command("setByPassZone", code, params)
+
+    async def set_output(self, output: int, code: str, turn_on: bool) -> bool:
+        """Switch the given output on or off, requires the alarm code"""
+        params = {
+            "outputId": output,  # Lares outputs are 0-indexed in setOutput
+            "outputValue": OUTPUT_ON_VALUE if turn_on else OUTPUT_OFF_VALUE,
+        }
+
+        return await self.send_command("setOutput", code, params)
 
     async def get_descriptions(self, path: str, element: str) -> dict | None:
         """Get descriptions"""
