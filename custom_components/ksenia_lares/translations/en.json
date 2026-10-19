@@ -15,6 +15,9 @@
                     "port": "Port",
                     "password": "Password",
                     "username": "Username"
+                },
+                "data_description": {
+                    "host": "IP address or hostname of the panel. You can also enter a full URL (e.g. https://lares.example.com) to reach the panel over HTTPS or through a reverse proxy."
                 }
             }
         }
