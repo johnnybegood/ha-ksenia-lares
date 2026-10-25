@@ -32,9 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DATA_UPDATE_LISTENER: unsub_options_update_listener,
     }
 
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
