@@ -1,11 +1,37 @@
 """Load real platforms and check cleanup and options-triggered reload."""
+import asyncio
 from datetime import timedelta
+from unittest.mock import patch
 
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.ksenia_lares.const import DOMAIN, DATA_COORDINATOR
+
+
+async def test_setup_waits_for_platforms(hass, entry, panel):
+    """Do not finish entry setup while platform forwarding is still pending."""
+    started = asyncio.Event()
+    release = asyncio.Event()
+    forward = hass.config_entries.async_forward_entry_setups
+
+    async def delayed_forward(config_entry, platforms):
+        started.set()
+        await release.wait()
+        await forward(config_entry, platforms)
+
+    with patch.object(hass.config_entries, "async_forward_entry_setups", side_effect=delayed_forward):
+        setup = asyncio.create_task(hass.config_entries.async_setup(entry.entry_id))
+        try:
+            await asyncio.wait_for(started.wait(), timeout=5)
+            assert not setup.done()
+        finally:
+            release.set()
+            assert await setup
+            await hass.async_block_till_done()
+            assert await hass.config_entries.async_unload(entry.entry_id)
+            await hass.async_block_till_done()
 
 
 async def test_setup_unload_stops_polling(hass, entry, panel):
