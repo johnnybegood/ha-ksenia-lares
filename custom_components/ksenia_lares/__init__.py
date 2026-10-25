@@ -9,7 +9,7 @@ from homeassistant.const import Platform
 
 from .base import LaresBase
 from .coordinator import LaresDataUpdateCoordinator
-from .const import DOMAIN, DATA_COORDINATOR, DATA_UPDATE_LISTENER
+from .const import DOMAIN, DATA_COORDINATOR, DATA_UPDATE_LISTENER, CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.ALARM_CONTROL_PANEL, Platform.SWITCH]
@@ -19,7 +19,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Ksenia Lares Alarm from a config entry."""
 
     client = LaresBase(entry.data)
-    coordinator = LaresDataUpdateCoordinator(hass, client)
+    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    coordinator = LaresDataUpdateCoordinator(hass, client, scan_interval)
 
     # Preload device info
     await client.device_info()

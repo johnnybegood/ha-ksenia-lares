@@ -24,7 +24,9 @@ from .const import (
     CONF_SCENARIO_AWAY,
     CONF_SCENARIO_NIGHT,
     CONF_SCENARIO_DISARM,
-    CONF_PIN
+    CONF_PIN,
+    CONF_SCAN_INTERVAL,
+    DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -109,6 +111,10 @@ class LaresOptionsFlowHandler(OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
+            # The saved PIN is never shown in the form: keep it when the field
+            # is left empty, otherwise saving other options would erase it.
+            if not user_input.get(CONF_PIN) and self.config_entry.options.get(CONF_PIN):
+                user_input[CONF_PIN] = self.config_entry.options[CONF_PIN]
             return self.async_create_entry(title="", data=user_input)
 
         partitions = await self.client.partition_descriptions()
@@ -119,6 +125,10 @@ class LaresOptionsFlowHandler(OptionsFlow):
 
         options = {
             vol.Optional(CONF_PIN): str,
+            vol.Optional(
+                CONF_SCAN_INTERVAL,
+                default=self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+            ): vol.All(int, vol.Range(min=5, max=300)),
             vol.Required(
                 CONF_SCENARIO_DISARM,
                 default=self.config_entry.options.get(CONF_SCENARIO_DISARM, ""),

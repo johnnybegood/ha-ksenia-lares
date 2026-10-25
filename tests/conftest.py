@@ -46,6 +46,7 @@ def entry(hass):
         data={"host": "panel.invalid", "port": 4202, "username": "test", "password": "test"},
         options={
             "pin": "739182",
+            "scan_interval": 10,
             "scenario_disarm": "Disarm",
             "scenario_away": "Away",
             "partition_away": ["Test partition"],

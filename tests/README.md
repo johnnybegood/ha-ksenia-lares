@@ -38,6 +38,8 @@ claim of full integration coverage; there is no arbitrary percentage gate.
 - User setup, invalid authentication and unexpected setup errors.
 - Opening options with existing defaults, without exposing the saved PIN in the
   form; saving explicitly supplied options.
+- Keeping the saved PIN when the options form leaves it omitted or blank, and the
+  configurable polling interval: default for older entries, range and reload.
 - Real setup of all four existing platforms, scheduled polling, cleanup after
   unload, and an options-triggered reload without duplicate registry entries.
 - Scenario and zone bypass/unbypass commands, successful and rejected responses:
@@ -45,10 +47,6 @@ claim of full integration coverage; there is no arbitrary percentage gate.
 - Output switches: missing or short output metadata keeps bypass switches, stale or
   missing output data is unavailable, slow/malformed output responses do not block
   zone/partition updates, and commands report rejection or a missing PIN.
-
-PIN preservation when the field is omitted or blank is **not** asserted here;
-that behavior belongs to PR #49. Add it with the corresponding fix, so tests
-describe the intended behavior rather than enshrine existing defects.
 
 ## Maintaining the suite
 
