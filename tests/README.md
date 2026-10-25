@@ -44,10 +44,9 @@ claim of full integration coverage; there is no arbitrary percentage gate.
   unload, and an options-triggered reload without duplicate registry entries.
 - Scenario and zone bypass/unbypass commands, successful and rejected responses:
   the outgoing request contains the synthetic PIN but debug logs do not.
-
-Output-control changes in PR #48 also need their own regression cases. Add them
-with the corresponding fixes, so tests describe the intended behavior rather than
-enshrine existing defects.
+- Output switches: missing or short output metadata keeps bypass switches, stale or
+  missing output data is unavailable, slow/malformed output responses do not block
+  zone/partition updates, and commands report rejection or a missing PIN.
 
 ## Maintaining the suite
 
