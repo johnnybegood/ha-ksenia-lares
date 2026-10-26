@@ -15,6 +15,9 @@
                     "port": "Porta",
                     "password": "Palavra-passe",
                     "username": "Nome de utilizador"
+                },
+                "data_description": {
+                    "host": "Endereço IP ou nome de anfitrião do painel. Também pode introduzir um URL completo (por exemplo, https://lares.example.com) para aceder ao painel através de HTTPS ou de um proxy inverso."
                 }
             }
         }

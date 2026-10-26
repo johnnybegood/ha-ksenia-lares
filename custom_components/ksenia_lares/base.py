@@ -1,6 +1,7 @@
 """Base component for Lares"""
 import logging
 from typing import Any
+from urllib.parse import urlparse
 
 import aiohttp
 from getmac import get_mac_address
@@ -24,9 +25,21 @@ class LaresBase:
         port = data["port"]
 
         self._auth = aiohttp.BasicAuth(username, password)
-        self._ip = host
-        self._port = port
-        self._host = f"http://{host}:{self._port}"
+
+        # The host may be a bare IP/hostname (the common case) or a full URL
+        # with a scheme (e.g. when the panel is reached through an HTTPS reverse
+        # proxy). When a scheme is given, honour it together with any port in
+        # the URL; otherwise default to http:// on the configured port.
+        if "://" in host:
+            parsed = urlparse(host)
+            self._ip = parsed.hostname
+            self._port = parsed.port if parsed.port is not None else port
+            self._host = f"{parsed.scheme}://{parsed.netloc}"
+        else:
+            self._ip = host
+            self._port = port
+            self._host = f"http://{host}:{self._port}"
+
         self._model = None
         self._zone_descriptions = None
         self._partition_descriptions = None

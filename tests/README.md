@@ -42,6 +42,8 @@ claim of full integration coverage; there is no arbitrary percentage gate.
   configurable polling interval: default for older entries, range and reload.
 - Real setup of all four existing platforms, scheduled polling, cleanup after
   unload, and an options-triggered reload without duplicate registry entries.
+- A host given as a bare address or as a full URL (scheme and optional port):
+  request URL, configuration URL and device identity.
 - Scenario and zone bypass/unbypass commands, successful and rejected responses:
   the outgoing request contains the synthetic PIN but debug logs do not.
 - Output switches: missing or short output metadata keeps bypass switches, stale or
